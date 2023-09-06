@@ -5,16 +5,16 @@
               [clojure.data.json :as json]
               [clj-yaml.core :as yaml]))
 
-(def comma_delimiter ",")
-(def empty_string "")
+(def comma-string ",")
+(def empty-string "")
 
 (defn split-and-trim
     [text & [delimiter]]
-    (let [separator (or delimiter comma_delimiter)]
-        (->> (str/split text (re-pattern (str separator)))
+    (let [separator (or delimiter comma-string)]
+        (->> (str/split text (re-pattern separator))
              (map str/trim))))
 
-(defn trim_list
+(defn trim-list
     [strings-list]
     (map str/trim strings-list))
 
@@ -29,6 +29,15 @@
                  (or (= lower-text "true") (= lower-text "yes")) true
                  :else                                           (throw (ex-info "Invalid boolean value" {})))))))
 
+(defn to-short
+    [text & [default-value]]
+    (let [default-value (or default-value 0)]
+        (if (nil? text)
+            default-value
+            (try
+                (Short/parseShort text)
+                (catch NumberFormatException _ default-value)))))
+
 (defn to-int
     [text & [default-value]]
     (let [default-value (or default-value 0)]
@@ -38,13 +47,13 @@
                 (Integer/parseInt text)
                 (catch NumberFormatException _ default-value)))))
 
-(defn to-short
+(defn to-long
     [text & [default-value]]
     (let [default-value (or default-value 0)]
         (if (nil? text)
             default-value
             (try
-                (Short/parseShort text)
+                (Long/parseLong text)
                 (catch NumberFormatException _ default-value)))))
 
 (defn to-float
@@ -112,7 +121,7 @@
     **Returns** A new list where elements from the two input lists are multiplied and joined with the join_text separator.
     "
     [list1 list2 & [join-text]]
-    (let [join-text (or join-text empty_string)]
+    (let [join-text (or join-text empty-string)]
         (map #(apply str %)
              (for [item1 list1
                    item2 list2]
@@ -136,7 +145,7 @@
     **Returns** A list of combined and optionally filtered string.
     "
     [list1 list2 & [join-text func]]
-    (let [join-text (or join-text empty_string)
+    (let [join-text (or join-text empty-string)
           result    (atom [])]
         (doseq [item1 list1
                 item2 list2]
@@ -147,7 +156,7 @@
 
 (defn nil-to-default
     [text & [default-text]]
-    (let [default-text  (or default-text empty_string)]
+    (let [default-text  (or default-text empty-string)]
         (if (nil? text)
             default-text
             text)))

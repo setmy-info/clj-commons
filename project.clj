@@ -5,9 +5,6 @@
     {:name "MIT License"
      :url  "https://opensource.org/licenses/MIT"}
     :dependencies [[org.clojure/clojure "1.11.1"]
-                   [info.setmy/clj-file-traversal "0.1.0"]
-                   [org.clojure/java.jdbc "0.7.12"]
-                   [com.h2database/h2 "2.2.220"]
                    [org.clojure/tools.cli "1.0.219"]
                    [org.clojure/data.json "2.4.0"]
                    [clj-commons/clj-yaml "1.0.27"]]

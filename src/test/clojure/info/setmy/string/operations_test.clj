@@ -6,7 +6,7 @@
 (deftest split-and-trim-test
     (testing "Spliting untrimmed coma separated values"
              (is
-              (= (split-and-trim " asdfg , bsg, csdg  , dsg  " comma_delimiter)
+              (= (split-and-trim " asdfg , bsg, csdg  , dsg  " comma-string)
                  ["asdfg" "bsg" "csdg" "dsg"]))
              (is
               (= (split-and-trim " asdfg , bsg, csdg  , dsg  ")
@@ -15,9 +15,9 @@
 (deftest trim_list-test
     (testing "Strings list trimming"
              (is
-              (= (trim_list '("a  " " b " "  c  " "   d"))
+              (= (trim-list '("a  " " b " "  c  " "   d"))
                  ["a" "b" "c" "d"])
-              (= (trim_list ["a  " " b " "  c  " "   d"])
+              (= (trim-list ["a  " " b " "  c  " "   d"])
                  ["a" "b" "c" "d"]))))
 
 (deftest to-boolean-test
