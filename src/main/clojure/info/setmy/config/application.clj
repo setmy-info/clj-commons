@@ -52,6 +52,13 @@
          :else
          nil)))
 
+(defn applications-files-paths-parsing[config-paths application-files]
+    (let [is-file?      (fn [file-path] (.isFile (java.io.File. file-path)))
+          combined-list (string-ops/combined-by-function-list config-paths application-files "/" is-file?)
+          ; TODO : BUG : by some reason /application.yaml is added to list too (starting with "/", that is not in config-paths)
+          result-list   (map (fn [item] [item (parse-file-by-type item)]) combined-list)]
+        result-list))
+
 (defn init [args args-config]
     (let [arguments                          (arg-parser/parse-arguments args args-config)
           env-config-paths                   (env-variables/get-environment-variables-list "SMI_CONFIG_PATHS")
@@ -71,13 +78,7 @@
           application-profiles-file-prefixes (string-ops/combined-list [application-file-prefix] profiles-list "-")
           application-profiles-files         (string-ops/combined-list application-profiles-file-prefixes application-file-suffixes ".")
           application-files                  (collection-ops/apply-concat-many default-application-files application-profiles-files)
-          applications-files-paths           ((fn [config-paths application-files]
-                                                  (let [is-file?      (fn [file-path] (.isFile (java.io.File. file-path)))
-                                                        combined-list (string-ops/combined-by-function-list config-paths application-files "/" is-file?)
-                                                        ; TODO : BUG : by some reason /application.yaml is added to list too (starting with "/", that is not in config-paths)
-                                                        result-list   (map (fn [item] [item (parse-file-by-type item)]) combined-list)]
-                                                      result-list))
-                                                 config-paths application-files)]
+          applications-files-paths           (applications-files-paths-parsing config-paths application-files)]
         {:env-profiles                       env-profiles
          :cli-profiles                       cli-profiles
          :env-config-paths                   env-config-paths
