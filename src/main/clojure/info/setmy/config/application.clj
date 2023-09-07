@@ -55,30 +55,38 @@
 (defn applications-files-paths-parsing[config-paths application-files]
     (let [is-file?      (fn [file-path] (.isFile (java.io.File. file-path)))
           combined-list (string-ops/combined-by-function-list config-paths application-files "/" is-file?)
-          ; TODO : BUG : by some reason /application.yaml is added to list too (starting with "/", that is not in config-paths)
           result-list   (map (fn [item] [item (parse-file-by-type item)]) combined-list)]
         result-list))
 
+(defn merge-maps [left right]
+    (merge-with (fn [left right] right) left right))
+
+(defn merge-config [applications-files-contents]
+    (reduce (fn [x y] (merge-maps x y))
+            {}
+            (map (fn [pair] (second pair)) applications-files-contents)))
+
 (defn init [args args-config]
-    (let [arguments                          (arg-parser/parse-arguments args args-config)
-          env-config-paths                   (env-variables/get-environment-variables-list "SMI_CONFIG_PATHS")
-          cli-config-paths                   (get-cli-config-paths :smi-config-paths arguments)
-          env-profiles                       (env-variables/get-environment-variables-list "SMI_PROFILES")
-          cli-profiles                       (get-cli-config-paths :smi-profiles arguments)
-          config-paths                       (collection-ops/apply-concat-many
-                                              ["./src/main/resources"
-                                               "./main/resources"
-                                               "./resources"]
-                                              ["./src/test/resources"
-                                               "./test/resources"]
-                                              env-config-paths
-                                              cli-config-paths)
-          profiles-list                      (find-last-not-none-and-empty env-profiles cli-profiles)
-          default-application-files          (string-ops/combined-list [application-file-prefix] application-file-suffixes ".")
-          application-profiles-file-prefixes (string-ops/combined-list [application-file-prefix] profiles-list "-")
-          application-profiles-files         (string-ops/combined-list application-profiles-file-prefixes application-file-suffixes ".")
-          application-files                  (collection-ops/apply-concat-many default-application-files application-profiles-files)
-          applications-files-paths           (applications-files-paths-parsing config-paths application-files)]
+    (let [arguments                           (arg-parser/parse-arguments args args-config)
+          env-config-paths                    (env-variables/get-environment-variables-list "SMI_CONFIG_PATHS")
+          cli-config-paths                    (get-cli-config-paths :smi-config-paths arguments)
+          env-profiles                        (env-variables/get-environment-variables-list "SMI_PROFILES")
+          cli-profiles                        (get-cli-config-paths :smi-profiles arguments)
+          config-paths                        (collection-ops/apply-concat-many
+                                               ["./src/main/resources"
+                                                "./main/resources"
+                                                "./resources"]
+                                               ["./src/test/resources"
+                                                "./test/resources"]
+                                               env-config-paths
+                                               cli-config-paths)
+          profiles-list                       (find-last-not-none-and-empty env-profiles cli-profiles)
+          default-application-files           (string-ops/combined-list [application-file-prefix] application-file-suffixes ".")
+          application-profiles-file-prefixes  (string-ops/combined-list [application-file-prefix] profiles-list "-")
+          application-profiles-files          (string-ops/combined-list application-profiles-file-prefixes application-file-suffixes ".")
+          application-files                   (collection-ops/apply-concat-many default-application-files application-profiles-files)
+          applications-files-contents         (applications-files-paths-parsing config-paths application-files)
+          merged-configuration                (merge-config applications-files-contents)]
         {:env-profiles                       env-profiles
          :cli-profiles                       cli-profiles
          :env-config-paths                   env-config-paths
@@ -89,4 +97,5 @@
          :application-profiles-file-prefixes application-profiles-file-prefixes
          :application-profiles-files         application-profiles-files
          :application-files                  application-files
-         :applications-files-paths           applications-files-paths}))
+         :applications-files-contents        applications-files-contents
+         :merged-configuration               merged-configuration}))

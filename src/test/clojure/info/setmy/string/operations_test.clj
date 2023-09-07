@@ -96,11 +96,45 @@
                  (let [result (replace-named-placeholder placeholders-text "prs" "qwerty")]
                      (is (= result "abc ${def} ghi ${jkl} mno qwerty qwerty"))))))
 
+(deftest combined-list-with-empty-b-test
+    (testing "Joining arrays"
+             (let [result (combined-list ["A" "B" "C"] [] ":")]
+                 (is (= result [])))))
+
+(deftest combined-list-with-empty-a-test
+    (testing "Joining arrays"
+             (let [result (combined-list [] ["X" "Y"] ":")]
+                 (is (= result [])))))
+
+(deftest combined-list-with-nil-item-b-test
+    (testing "Joining arrays"
+             (let [result (combined-list ["A" "B" "C"] [nil] ":")]
+                 (is (= result [])))))
+
+(deftest combined-list-with-nil-item-a-test
+    (testing "Joining arrays"
+             (let [result (combined-list [nil] ["X" "Y"] ":")]
+                 (is (= result [])))))
+
 (deftest combined-list-test
     (testing "Joining arrays"
              (let [result (combined-list ["A" "B" "C"] ["X" "Y"])]
                  (is (= result ["AX" "AY" "BX" "BY" "CX" "CY"])))
              (let [result (combined-list ["A" "B" "C"] ["X" "Y"] ":")]
+                 (is (= result ["A:X" "A:Y" "B:X" "B:Y" "C:X" "C:Y"])))))
+
+(deftest combined-list-test-2
+    (testing "Joining arrays"
+             (let [result (combined-list ["A" "B" "C"] ["X" "Y" nil])]
+                 (is (= result ["AX" "AY" "BX" "BY" "CX" "CY"])))
+             (let [result (combined-list ["A" "B" "C"] ["X" "Y" nil] ":")]
+                 (is (= result ["A:X" "A:Y" "B:X" "B:Y" "C:X" "C:Y"])))))
+
+(deftest combined-list-test-3
+    (testing "Joining arrays"
+             (let [result (combined-list ["A" "B" "C" nil] ["X" "Y"])]
+                 (is (= result ["AX" "AY" "BX" "BY" "CX" "CY"])))
+             (let [result (combined-list ["A" "B" "C" nil] ["X" "Y"] ":")]
                  (is (= result ["A:X" "A:Y" "B:X" "B:Y" "C:X" "C:Y"])))))
 
 (deftest combined-by-function-list-test

@@ -3,7 +3,8 @@
     (:gen-class)
     (:require [clojure.string :as str]
               [clojure.data.json :as json]
-              [clj-yaml.core :as yaml]))
+              [clj-yaml.core :as yaml]
+              [info.setmy.collection.operations :as collection-ops]))
 
 (def comma-string ",")
 (def empty-string "")
@@ -122,11 +123,12 @@
     **Returns** A new list where elements from the two input lists are multiplied and joined with the join_text separator.
     "
     [list1 list2 & [join-text]]
-    (let [join-text (or join-text empty-string)]
-        (map #(apply str %)
-             (for [item1 list1
-                   item2 list2]
-                 (str item1 join-text item2)))))
+    (let [join-text   (or join-text "")]
+        (->> (collection-ops/product-as-pairs list1 list2)
+             (filter
+              (fn [pair] (if (or (nil? (first pair)) (nil? (second pair))) false true)))
+             (map
+              (fn [pair] (str (first pair) join-text (second pair)))))))
 
 (defn combined-by-function-list
     "Combines two lists of string into a new list using a join_text separator
