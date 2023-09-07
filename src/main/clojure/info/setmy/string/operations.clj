@@ -9,6 +9,7 @@
 (def empty-string "")
 
 (defn split-and-trim
+    "Return LazySeq"
     [text & [delimiter]]
     (let [separator (or delimiter comma-string)]
         (->> (str/split text (re-pattern separator))

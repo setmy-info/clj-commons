@@ -2,4 +2,4 @@
     "Configuration classes."
     (:gen-class))
 
-(defrecord Config [description arguments])
+(defrecord Config [description arguments-config])

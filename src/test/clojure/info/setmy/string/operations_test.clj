@@ -5,9 +5,9 @@
 
 (deftest split-and-trim-test
     (testing "Spliting untrimmed coma separated values"
-             (is
-              (= (split-and-trim " asdfg , bsg, csdg  , dsg  " comma-string)
-                 ["asdfg" "bsg" "csdg" "dsg"]))
+             (let [cleaned (split-and-trim " asdfg , bsg, csdg  , dsg  " comma-string)]
+                 (is
+                  (= cleaned ["asdfg" "bsg" "csdg" "dsg"])))
              (is
               (= (split-and-trim " asdfg , bsg, csdg  , dsg  ")
                  ["asdfg" "bsg" "csdg" "dsg"]))))
