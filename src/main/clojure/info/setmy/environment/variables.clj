@@ -52,7 +52,8 @@
         (if (nil? variable-name)
             []
             (let [trimmed-list (trim-list
-                                (str/split (get-environment-variable variable-name) (re-pattern comma-string)))]
+                                (str/split (nil-to-default (get-environment-variable variable-name))
+                                           (re-pattern comma-string)))]
                 (if (nil? parse-function)
                     trimmed-list
                     (map-indexed parse-function trimmed-list))))))

@@ -147,12 +147,14 @@
     "
     [list1 list2 & [join-text func]]
     (let [join-text (or join-text empty-string)
+          ;func      (or func (fn [x] true))
           result    (atom [])]
         (doseq [item1 list1
                 item2 list2]
             (let [sum-item (str item1 join-text item2)]
-                (when (and (not (nil? func)) (func sum-item))
+                (when (and (not (nil? func)) (func sum-item)) ;(when (func sum-item)
                       (swap! result conj sum-item))))
+        ;(println "combined-by-function-list:" @result)
         @result))
 
 (defn nil-to-default

@@ -15,6 +15,7 @@
     :test-paths ["src/test/clojure"]
     :resource-paths ["src/main/resources" "./target/classes"]
     :profiles
+    ; with-profile :abc
     {:uberjar {:aot      :all
                :jvm-opts ["-Dclojure.compiler.direct-linking=true"]}
      :local   {}

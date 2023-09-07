@@ -1,0 +1,4 @@
+name: "./test/resources/cli/application.yaml"
+g:
+    h:
+        i: cli/application.yaml
