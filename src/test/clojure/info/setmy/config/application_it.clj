@@ -26,7 +26,7 @@
                       (= name "./test/resources/application.yaml"))
                      (is
                       (= merged-configuration-keys-number 2))
-                     (.info log "==========Info message=========")
+                     (.info log "Message {}" "This is message")
                      (println "=====" result)))))
 
 (deftest init-cli-test
