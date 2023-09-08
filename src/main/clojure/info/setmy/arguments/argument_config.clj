@@ -10,4 +10,3 @@
 
 (def smi-config-paths
     (->ArgumentConfig "smi-config-paths COMMA_SEPARATED_CONFIG_PATHS" "c" str-ops/split-and-trim "Comma separated config paths." false))
-
