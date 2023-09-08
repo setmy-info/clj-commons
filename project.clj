@@ -7,7 +7,9 @@
     :dependencies [[org.clojure/clojure "1.11.1"]
                    [org.clojure/tools.cli "1.0.219"]
                    [org.clojure/data.json "2.4.0"]
-                   [clj-commons/clj-yaml "1.0.27"]]
+                   [clj-commons/clj-yaml "1.0.27"]
+                   [org.apache.logging.log4j/log4j-api "2.20.0"]
+                   [org.apache.logging.log4j/log4j-core "2.20.0"]]
     :plugins [[lein-codox "0.10.8"]]
     :main ^:skip-aot info.setmy.commons
     :target-path "target/%s"
@@ -21,7 +23,7 @@
      :local   {}
      :dev     {}
      :ci      {}
-     :test    {}
+     :test    {:resource-paths ["src/test/resources"]}
      :prelive {}
      :live    {}}
     :deploy-repositories

@@ -1,9 +1,12 @@
 (ns info.setmy.config.application-it
+    (:import [org.apache.logging.log4j LogManager])
     (:require [clojure.test :refer :all]
               [info.setmy.config.application :refer :all]
               [info.setmy.arguments.argument-config :refer :all]
               [info.setmy.string.operations :as str-ops]
               [info.setmy.arguments.config :refer :all]))
+
+(def log (LogManager/getLogger (str (ns-name *ns*))))
 
 (deftest init-default-test
     (testing "Arguments parsings default config"
@@ -23,6 +26,7 @@
                       (= name "./test/resources/application.yaml"))
                      (is
                       (= merged-configuration-keys-number 2))
+                     (.info log "==========Info message=========")
                      (println "=====" result)))))
 
 (deftest init-cli-test
