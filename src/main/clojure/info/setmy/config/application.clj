@@ -6,14 +6,18 @@
               [info.setmy.environment.variables :as env-variables]
               [info.setmy.collection.operations :as collection-ops]
               [info.setmy.string.operations :as string-ops]
+              [info.setmy.config.constants :refer :all]
               [info.setmy.yaml.parser :as yaml-parser]
               [info.setmy.json.parser :as json-parser]
               [clojure.string :as str]))
 
-(def application-file-prefix "application")
-(def application-file-suffixes ["json", "yml", "yaml"])
-
 (defn get-cli-config-paths
+    [keyword arguments]
+    (let [options                (:options arguments)
+          result                 (keyword options)]
+        (if (nil? result) [] result)))
+
+(defn get-cli-optional-config-files
     [keyword arguments]
     (let [options                (:options arguments)
           result                 (keyword options)]
@@ -52,10 +56,15 @@
          :else
          nil)))
 
-(defn applications-files-paths-parsing[config-paths application-files]
-    (let [is-file?      (fn [file-path] (.isFile (java.io.File. file-path)))
-          combined-list (string-ops/combined-by-function-list config-paths application-files "/" is-file?)
-          result-list   (map (fn [item] [item (parse-file-by-type item)]) combined-list)]
+(defn applications-files-paths-parsing
+    [config-paths
+     application-files
+     optional-env-application-files
+     optional-cli-application-files]
+    (let [is-file?                (fn [file-path] (.isFile (java.io.File. file-path)))
+          combined-list           (string-ops/combined-by-function-list config-paths application-files "/" is-file?)
+          concatenated-files-list (concat combined-list optional-env-application-files optional-cli-application-files)
+          result-list             (map (fn [item] [item (parse-file-by-type item)]) concatenated-files-list)]
         result-list))
 
 (defn merge-maps [left right]
@@ -68,9 +77,9 @@
 
 (defn init [args args-config]
     (let [arguments                           (arg-parser/parse-arguments args args-config)
-          env-config-paths                    (env-variables/get-environment-variables-list "SMI_CONFIG_PATHS")
+          env-config-paths                    (env-variables/get-environment-variables-list smi-config-paths)
           cli-config-paths                    (get-cli-config-paths :smi-config-paths arguments)
-          env-profiles                        (env-variables/get-environment-variables-list "SMI_PROFILES")
+          env-profiles                        (env-variables/get-environment-variables-list smi-profiles)
           cli-profiles                        (get-cli-config-paths :smi-profiles arguments)
           config-paths                        (collection-ops/apply-concat-many
                                                ["./src/main/resources"
@@ -81,11 +90,13 @@
                                                env-config-paths
                                                cli-config-paths)
           profiles-list                       (find-last-not-none-and-empty env-profiles cli-profiles)
-          default-application-files           (string-ops/combined-list [application-file-prefix] application-file-suffixes ".")
-          application-profiles-file-prefixes  (string-ops/combined-list [application-file-prefix] profiles-list "-")
+          default-application-files           (string-ops/combined-list application-file-prefixes application-file-suffixes ".")
+          application-profiles-file-prefixes  (string-ops/combined-list application-file-prefixes profiles-list "-")
           application-profiles-files          (string-ops/combined-list application-profiles-file-prefixes application-file-suffixes ".")
           application-files                   (collection-ops/apply-concat-many default-application-files application-profiles-files)
-          applications-files-contents         (applications-files-paths-parsing config-paths application-files)
+          optional-env-application-files      (env-variables/get-environment-variables-list smi-optional-config-files)
+          optional-cli-application-files      (get-cli-optional-config-files :smi-optional-config-files arguments)
+          applications-files-contents         (applications-files-paths-parsing config-paths application-files optional-env-application-files optional-cli-application-files)
           merged-configuration                (merge-config applications-files-contents)]
         {:env-profiles                       env-profiles
          :cli-profiles                       cli-profiles

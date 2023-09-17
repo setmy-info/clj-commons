@@ -3,6 +3,7 @@
     (:require [clojure.test :refer :all]
               [info.setmy.config.application :refer :all]
               [info.setmy.arguments.argument-config :refer :all]
+              [info.setmy.arguments.constants :refer :all]
               [info.setmy.string.operations :as str-ops]
               [info.setmy.arguments.config :refer :all]))
 
@@ -14,6 +15,7 @@
                    description        "Test CLI"
                    arguments-config   [smi-profiles-argument
                                        smi-config-paths
+                                       smi-optional-config-files
                                        (->ArgumentConfig "some-other PLACEHOLDER" "s" str-ops/split-and-trim "Explanation." false)
                                        (->ArgumentConfig "another-other PLACEHOLDER" "a" str-ops/split-and-trim "Explanation." true)]
                    config             (->Config description arguments-config)]
@@ -27,6 +29,7 @@
                      (is
                       (= merged-configuration-keys-number 2))
                      (.info log "Message {}" "This is message")
+                     #_(.info log "===== {}" result)
                      (println "=====" result)))))
 
 (deftest init-cli-test
@@ -39,10 +42,13 @@
                                        "--smi-profiles"
                                        "profile1,profile2"
                                        "--smi-config-paths"
-                                       "./src/test/resources/cli"]
+                                       "./src/test/resources/cli"
+                                       "--smi-optional-config-files"
+                                       "./src/test/resources/cli/optional.yaml"]
                    description        "Test CLI"
                    arguments-config   [smi-profiles-argument
                                        smi-config-paths
+                                       smi-optional-config-files
                                        (->ArgumentConfig "some-other PLACEHOLDER" "s" str-ops/split-and-trim "Explanation." false)
                                        (->ArgumentConfig "another-other PLACEHOLDER" "a" str-ops/split-and-trim "Explanation." true)]
                    config             (->Config description arguments-config)]
@@ -51,9 +57,13 @@
                        merged-configuration-keys-number (count (keys merged-configuration))
                        name                             (:name merged-configuration)
                        a                                (:a merged-configuration)
+                       k                                (:k a)
+                       l                                (:l k)
                        g                                (:g merged-configuration)]
                      #_(println ":applications-files-contents" (:applications-files-contents result))
                      (is
                       (= name "./test/resources/cli/application.yaml"))
                      (is
-                      (= merged-configuration-keys-number 3))))))
+                      (= merged-configuration-keys-number 3))
+                     (is
+                      (= l "Some optional value from CLI optional yaml"))))))

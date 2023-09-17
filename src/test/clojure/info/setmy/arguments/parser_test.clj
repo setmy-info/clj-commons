@@ -2,6 +2,7 @@
     (:require [clojure.test :refer :all]
               [info.setmy.arguments.parser :refer :all]
               [info.setmy.arguments.argument-config :refer :all]
+              [info.setmy.arguments.constants :refer :all]
               [info.setmy.arguments.config :refer :all]
               [info.setmy.string.operations :as str-ops]
               [clojure.string :as str]))
