@@ -38,3 +38,22 @@
 
 ...
 
+```clojure
+(defn load-properties-from-classpath [filename]
+    (comment
+     (let [classloader (Thread/currentThread)
+           .getContextClassLoader
+           properties
+           (Properties.)]
+         (with-open [stream (.getResourceAsStream classloader filename)]
+             (if stream
+                 (do
+                     (.load properties stream)
+                     (set-application-properties properties)
+                     properties)
+                 (throw (Exception. (str "File " filename " not found on CLASSPATH"))))))))
+```
+
+```clojure
+(defonce os-path-separator (System/getProperty "file.separator"))
+```
