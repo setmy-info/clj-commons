@@ -20,7 +20,7 @@
                                        "./src/test/resourses,./src/main/resourses"]
                    description        "Test CLI"
                    arguments-config   [smi-profiles-argument
-                                       smi-config-paths
+                                       smi-config-paths-argument
                                        (->ArgumentConfig "some-other PLACEHOLDER" "s" str-ops/split-and-trim "Explanation." false)
                                        (->ArgumentConfig "another-other PLACEHOLDER" "a" str-ops/split-and-trim "Explanation." true)]
                    config             (->Config description arguments-config)]

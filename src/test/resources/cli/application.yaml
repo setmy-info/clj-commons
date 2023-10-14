@@ -1,3 +1,5 @@
+application:
+    name: Cli Application
 name: "./test/resources/cli/application.yaml"
 g:
     h:

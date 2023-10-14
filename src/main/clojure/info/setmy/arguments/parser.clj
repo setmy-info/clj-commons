@@ -5,14 +5,14 @@
         [clojure.tools.cli :refer [parse-opts]]))
 
 (defn map-arguments-config
-    [x]
-    [(str "-" (:short-flag x))
-     (str "--" (:name x))
-     (:argument-help x)
+    [argument-config]
+    [(str "-" (:short-flag argument-config))
+     (str "--" (:name argument-config))
+     (:argument-help argument-config)
      :parse-fn
-        (:argument-type x)
+        (:argument-type-func argument-config)
      :validate
-        [(if (:required x)
+        [(if (:required argument-config)
              (fn [value] (if (nil? value) false true))
              (fn [value] true))]])
 
@@ -20,8 +20,8 @@
 (defn argument-parser-config
     [args-config]
     (let [description             (:description args-config)
-          arguments-config        (:arguments-config args-config)
-          mapped-arguments-config (map map-arguments-config arguments-config)]
+          argument-config         (:arguments-config args-config)
+          mapped-arguments-config (map map-arguments-config argument-config)]
         mapped-arguments-config))
 
 (defn parse-arguments

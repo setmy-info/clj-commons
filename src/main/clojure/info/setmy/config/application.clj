@@ -3,13 +3,18 @@
     (:gen-class)
     (:require [info.setmy.arguments.parser :as arg-parser]
               [info.setmy.environment.variables :as env-variables]
-              [info.setmy.environment.variables :as env-variables]
               [info.setmy.collection.operations :as collection-ops]
               [info.setmy.string.operations :as string-ops]
               [info.setmy.config.constants :refer :all]
               [info.setmy.yaml.parser :as yaml-parser]
               [info.setmy.json.parser :as json-parser]
               [clojure.string :as str]))
+
+(defn get-cli-name
+    [keyword arguments]
+    (let [options                (:options arguments)
+          result                 (keyword options)]
+        result))
 
 (defn get-cli-config-paths
     [keyword arguments]
@@ -75,6 +80,13 @@
             {}
             (map (fn [pair] (second pair)) applications-files-contents)))
 
+(defn get-config-app-name
+    [config]
+    (let [application (:application config)]
+        (if (not (nil? application))
+            (:name application)
+            nil)))
+
 (defn init [args args-config]
     (let [arguments                           (arg-parser/parse-arguments args args-config)
           env-config-paths                    (env-variables/get-environment-variables-list smi-config-paths)
@@ -97,7 +109,11 @@
           optional-env-application-files      (env-variables/get-environment-variables-list smi-optional-config-files)
           optional-cli-application-files      (get-cli-optional-config-files :smi-optional-config-files arguments)
           applications-files-contents         (applications-files-paths-parsing config-paths application-files optional-env-application-files optional-cli-application-files)
-          merged-configuration                (merge-config applications-files-contents)]
+          merged-configuration                (merge-config applications-files-contents)
+          name                                (or (get-cli-name :smi-name arguments)
+                                                  (env-variables/get-environment-variable smi-name)
+                                                  (get-config-app-name merged-configuration)
+                                                  "default")]
         {:env-profiles                       env-profiles
          :cli-profiles                       cli-profiles
          :env-config-paths                   env-config-paths

@@ -1,4 +1,4 @@
-(defproject info.setmy/clj-commons "0.2.0"
+(defproject info.setmy/clj-commons "0.3.0"
     :description "Commons functionality for Clojure projects."
     :url "https://github.com/setmy-info/clj-commons"
     :license
